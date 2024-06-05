@@ -8,9 +8,7 @@ using UnityEngine.InputSystem;
 public class GameInput : MonoBehaviour
 {
    private PlayerInputActions _playerInputActions;
-   
-  
-   
+   public event EventHandler OnInteractAction;
    
    private void Awake()
    {
@@ -22,7 +20,12 @@ public class GameInput : MonoBehaviour
 
    private void Interact_performed(InputAction.CallbackContext obj)
    {
-      Debug.Log(obj);
+      
+       //Debug.Log("dd");
+       if (OnInteractAction != null)
+       {
+            OnInteractAction?.Invoke(this, EventArgs.Empty);
+       }
    }
 
    public Vector2 GetMovementVectorNormalized()

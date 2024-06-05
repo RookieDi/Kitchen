@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,7 +6,7 @@ using UnityEngine.Serialization;
 
 public class Move : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed = 1f;
+    [SerializeField] private float moveSpeed = 6f;
     [SerializeField] private GameInput _gameInput;
     [SerializeField] private float _playerRadius = 0.1f;
     [SerializeField] private float _playerHeight = 2f;
@@ -15,17 +16,52 @@ public class Move : MonoBehaviour
     private bool _isWalking;
     private Vector3 lastInteractDir;
 
+    private void Start()
+    {
+        _gameInput.OnInteractAction += GameInput_OnInteraction;
+    }
+
+    private void GameInput_OnInteraction(object sender, System.EventArgs e)
+    {
+        Vector2 inputVector = _gameInput.GetMovementVectorNormalized();
+        Vector3 moveDir = new Vector3(inputVector.x,0f, inputVector.y);
+        
+        if (moveDir != Vector3.zero)
+        {
+            lastInteractDir = moveDir;
+        }
+        float interactDistance = 1f;
+       
+        if (Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDistance,countersLayerMask))
+        {
+            //Debug.Log($"Raycast hit: {raycastHit.transform.name}");
+            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
+            {
+                clearCounter.Interact();
+               
+            }
+            else
+            {
+                Debug.Log("Hit object does not have ClearCounter component");
+            }
+        }
+        else
+        {
+           
+        }
+    }
+
     private void Update()
     {
        
        HandleMovement();
-       HandleInteraction();
+      // HandleInteraction();
         
     }
     
     public bool IsWalking()
     {
-        return !_isWalking;
+        return _isWalking;
     }
 
     private void HandleInteraction()
@@ -37,18 +73,24 @@ public class Move : MonoBehaviour
         {
             lastInteractDir = moveDir;
         }
-
+            
         if (Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDistance,countersLayerMask))
         {
             if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
             {
+                Debug.Log($"Raycast hit: {raycastHit.transform.name}");
                 clearCounter.Interact();
+            }
+            else
+            {
+                Debug.Log("Hit object does not have ClearCounter component");
             }
         }
         else
         {
-            Debug.Log("sal");
+            Debug.Log("Did not hit");
         }
+       
 
     }
 
@@ -94,7 +136,7 @@ public class Move : MonoBehaviour
             
 
            
-        float rotateSpeed = 5f; 
+        float rotateSpeed = 10f; 
         transform.forward = Vector3.Slerp(transform.forward, moveDir, Time.deltaTime * rotateSpeed);
 
 
