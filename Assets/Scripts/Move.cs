@@ -1,20 +1,45 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class Move : MonoBehaviour
+public class Move : MonoBehaviour,IKitchenObjectParent
 {
+    public static Move Instance { get; private set; }
+
+    
+    public event EventHandler <OnSelectedCounterChangedEventArgs>OnSelectedCounterchanged;
+    
+    public class OnSelectedCounterChangedEventArgs : EventArgs
+    {
+        public ClearCounter selectedCounter;
+    }
     [SerializeField] private float moveSpeed = 6f;
     [SerializeField] private GameInput _gameInput;
     [SerializeField] private float _playerRadius = 0.1f;
     [SerializeField] private float _playerHeight = 2f;
     [SerializeField] private Animator animator;
     [SerializeField] private LayerMask countersLayerMask;
+   [SerializeField] private Transform kitchenObjectHoldPoint;
+    private ClearCounter selectedCounter;
   
     private bool _isWalking;
     private Vector3 lastInteractDir;
+
+    private KitchenObject kitchenObj;
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Debug.LogError("There is more than one player instance!!!");
+        }
+    }
 
     private void Start()
     {
@@ -23,39 +48,18 @@ public class Move : MonoBehaviour
 
     private void GameInput_OnInteraction(object sender, System.EventArgs e)
     {
-        Vector2 inputVector = _gameInput.GetMovementVectorNormalized();
-        Vector3 moveDir = new Vector3(inputVector.x,0f, inputVector.y);
-        
-        if (moveDir != Vector3.zero)
-        {
-            lastInteractDir = moveDir;
-        }
-        float interactDistance = 1f;
-       
-        if (Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDistance,countersLayerMask))
-        {
-            //Debug.Log($"Raycast hit: {raycastHit.transform.name}");
-            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
-            {
-                clearCounter.Interact();
-               
-            }
-            else
-            {
-                Debug.Log("Hit object does not have ClearCounter component");
-            }
-        }
-        else
-        {
+       if(selectedCounter != null)
+       {
+           selectedCounter.Interact(this);
            
-        }
+       }
     }
 
     private void Update()
     {
        
        HandleMovement();
-      // HandleInteraction();
+      HandleInteraction();
         
     }
     
@@ -78,18 +82,22 @@ public class Move : MonoBehaviour
         {
             if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
             {
-                Debug.Log($"Raycast hit: {raycastHit.transform.name}");
-                clearCounter.Interact();
+                
+                
+                SetSelectedCounter(clearCounter);
+                
+                
             }
             else
             {
-                Debug.Log("Hit object does not have ClearCounter component");
+                SetSelectedCounter(null);
             }
         }
         else
         {
-            Debug.Log("Did not hit");
+            SetSelectedCounter(null);
         }
+        
        
 
     }
@@ -141,4 +149,39 @@ public class Move : MonoBehaviour
 
 
     }
+
+    private void SetSelectedCounter(ClearCounter newselectedCounter)
+    {
+        selectedCounter = newselectedCounter;
+        OnSelectedCounterchanged?.Invoke(this,new OnSelectedCounterChangedEventArgs()
+            {
+        selectedCounter=newselectedCounter
+        });
+    }
+
+    public Transform GetkitchenObjectFollowTransform()
+    {
+        return kitchenObjectHoldPoint;
+    }
+
+    public void SetKitchenObject(KitchenObject kitchenObject)
+    {
+        this.kitchenObj = kitchenObject;
+    }
+
+    public KitchenObject GetKitchenObject()
+    {
+        return kitchenObj;
+    }
+
+    public void ClearKitchenObject()
+    {
+        kitchenObj = null;
+    }
+
+    public bool HasKitchenObject()
+    {
+        return kitchenObj != null;
+    }
+    
 }
