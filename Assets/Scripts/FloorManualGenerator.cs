@@ -2,25 +2,25 @@ using UnityEngine;
 
 public class RoomGenerator : MonoBehaviour
 {
-    public int gridSize = 5; // Size of the grid (number of cubes along each axis)
-    public GameObject wallPrefab; // Prefab for the walls
-    public GameObject blackCubePrefab; // Prefab for the black cube
-    public GameObject whiteCubePrefab; // Prefab for the white cube
+    public int gridSize = 5; 
+    public GameObject wallPrefab; 
+    public GameObject blackCubePrefab; 
+    public GameObject whiteCubePrefab;
 
     [ContextMenu("Generate Room")]
     void GenerateRoom()
     {
       
-        // Generate floor
+       
         GenerateFloor();
 
-        // Generate walls
+    
         GenerateWalls();
     }
 
     void GenerateFloor()
     {
-        float cubeSpacing = 1f; // Spacing between cubes
+        float cubeSpacing = 1f; 
         Vector3 floorStartPosition = transform.position - new Vector3(gridSize * cubeSpacing / 2f, 0f, gridSize * cubeSpacing / 2f);
 
         for (int x = 0; x < gridSize; x++)

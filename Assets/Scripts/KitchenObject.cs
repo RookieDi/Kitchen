@@ -18,7 +18,7 @@ public class KitchenObject : MonoBehaviour
        
         if (newKitchenObjectParent.HasKitchenObject())
         {
-            Debug.LogError("Target ClearCounter already has a KitchenObject. Destroying the original object.");
+            //Debug.LogError("Target ClearCounter already has an object");
             
            
             Destroy(gameObject);
