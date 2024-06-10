@@ -7,17 +7,21 @@ using UnityEngine.UI;
 public class ProgressBarUi : MonoBehaviour
 {
   [SerializeField] private Image barIamge;
-  [SerializeField] private CuttinCounter _cuttinCounter;
+  [SerializeField] private GameObject hasProgressGameObject;
+  private IHasProgressBar hasProgress;
 
 
   private void Start()
   {
-    _cuttinCounter.OnProgressChanged += CuttingCounter_OnPorgressChanged;
+
+    hasProgress = hasProgressGameObject.GetComponent<IHasProgressBar>();
+   
+    hasProgress.OnProgressChanged += HasProgress_OnPorgressChanged;
     barIamge.fillAmount = 0f;
     Hide();
   }
 
-  private void CuttingCounter_OnPorgressChanged(object sender, CuttinCounter.OnProgressChangedEventArgs e)
+  private void HasProgress_OnPorgressChanged(object sender, IHasProgressBar.OnProgressChangedEventArgs e)
   {
     barIamge.fillAmount = e.progreesNormalized;
     if (e.progreesNormalized == 0f || e.progreesNormalized ==1f)

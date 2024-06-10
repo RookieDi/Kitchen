@@ -9,14 +9,14 @@ public class CuttingCounter : BaseCounter
     {
         if (!HasKitchenObject())
         {
-            if ( player.HasKitchenObject())
+            if (player.HasKitchenObject())
             {
                 player.GetKitchenObject().SetKitchenObjectParent(this);
             }
 
             else
             {
-                //Player not carrying
+
             }
         }
         else
@@ -27,7 +27,7 @@ public class CuttingCounter : BaseCounter
             }
             else
             {
-                //Player not carrying anithing
+                
                 GetKitchenObject().SetKitchenObjectParent(player);
             }
         }
