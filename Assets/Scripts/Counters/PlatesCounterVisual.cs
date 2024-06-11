@@ -9,13 +9,9 @@ public class PlatesCounterVisual : MonoBehaviour
     [SerializeField] private Transform PlateVisualPrefab;
     [SerializeField] private PlatesCounter platesCounter;
 
+    private List<GameObject> plateVisualGameObjectList=new List<GameObject>();
 
-    private List<GameObject> plateVisualGameObjectList;
-
-    private void Awake()
-    {
-        plateVisualGameObjectList = new List<GameObject>();
-    }
+  
 
     private void Start()
     {
@@ -23,11 +19,16 @@ public class PlatesCounterVisual : MonoBehaviour
         platesCounter.OnPlateRemoved += PlatesCounter_OnplateRemoved;
     }
 
+  
+    
+    
+    
     private void PlatesCounter_OnplateRemoved(object sender, EventArgs e)
     {
         GameObject plateGameObject = plateVisualGameObjectList[plateVisualGameObjectList.Count - 1];
         plateVisualGameObjectList.Remove(plateGameObject);
         Destroy(plateGameObject);
+
     }
 
     private void PlatesCounter_OnPlateSpawned(object sender, EventArgs e)

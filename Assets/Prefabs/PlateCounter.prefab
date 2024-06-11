@@ -11,7 +11,7 @@ PrefabInstance:
     - target: {fileID: 8060899813817766816, guid: 3adc2867d2349af49a34f0fc2846a053,
         type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8060899813817766816, guid: 3adc2867d2349af49a34f0fc2846a053,
         type: 3}
@@ -88,6 +88,12 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 3528627520413056688}
   m_SourcePrefab: {fileID: 100100000, guid: 3adc2867d2349af49a34f0fc2846a053, type: 3}
+--- !u!4 &511075387057093614 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3972163895874688824, guid: 3adc2867d2349af49a34f0fc2846a053,
+    type: 3}
+  m_PrefabInstance: {fileID: 3461089292674510038}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6905799385340936049 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8060899813817766823, guid: 3adc2867d2349af49a34f0fc2846a053,
@@ -106,9 +112,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab0a3dd7d0ca82c4d96b2bf30a16ca87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  counterTopPoint: {fileID: 0}
+  counterTopPoint: {fileID: 511075387057093614}
   kitchenObj: {fileID: 0}
-  plateKitchenObjectSO: {fileID: 0}
+  plateKitchenObjectSO: {fileID: 11400000, guid: a4b9c97af472e484886a6631ef1d1d94,
+    type: 2}
 --- !u!4 &6905799385340936054 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8060899813817766816, guid: 3adc2867d2349af49a34f0fc2846a053,
@@ -143,6 +150,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Visual
       objectReference: {fileID: 0}
+    - target: {fileID: 4589716710238282922, guid: e21b499d164095947b7559f0267f0e63,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4589716710238282923, guid: e21b499d164095947b7559f0267f0e63,
         type: 3}
       propertyPath: m_RootOrder
@@ -151,6 +163,16 @@ PrefabInstance:
     - target: {fileID: 4589716710238282923, guid: e21b499d164095947b7559f0267f0e63,
         type: 3}
       propertyPath: m_LocalScale.x
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4589716710238282923, guid: e21b499d164095947b7559f0267f0e63,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4589716710238282923, guid: e21b499d164095947b7559f0267f0e63,
+        type: 3}
+      propertyPath: m_LocalScale.z
       value: 1.1
       objectReference: {fileID: 0}
     - target: {fileID: 4589716710238282923, guid: e21b499d164095947b7559f0267f0e63,
@@ -240,7 +262,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e761dff2c3415b49865ab2c13da3f97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseCounter: {fileID: 0}
+  baseCounter: {fileID: 3528627520413056688}
   visualGameObjectArray:
   - {fileID: 6771275895575173297}
 --- !u!114 &7337312047638942807
@@ -255,6 +277,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec5bfd3d8880449419cf01900d0b73df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  counterTopPoint: {fileID: 511075387057093614}
+  PlateVisualPrefab: {fileID: 6905799385340936054}
+  platesCounter: {fileID: 3528627520413056688}
 --- !u!1 &6771275895575173297 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4472461010448373620, guid: e21b499d164095947b7559f0267f0e63,
