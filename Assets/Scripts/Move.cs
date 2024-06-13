@@ -171,6 +171,19 @@ public class Move : MonoBehaviour,IKitchenObjectParent
         return kitchenObjectHoldPoint;
     }
 
+
+    public bool TryGetPlateObject(out PlateKitchenObject plateKitchenObject)
+    {
+        if (kitchenObj.TryGetComponent(out PlateKitchenObject plate))
+        {
+            plateKitchenObject = plate;
+            return true;
+        }
+
+        plateKitchenObject = null;
+        return false;
+    }
+
     public void SetKitchenObject(KitchenObject kitchenObject)
     {
         this.kitchenObj = kitchenObject;
@@ -190,5 +203,7 @@ public class Move : MonoBehaviour,IKitchenObjectParent
     {
         return kitchenObj != null;
     }
+    
+    
     
 }
