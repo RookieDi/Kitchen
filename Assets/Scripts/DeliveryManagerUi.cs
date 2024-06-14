@@ -16,7 +16,7 @@ public class DeliveryManagerUi : MonoBehaviour
 
     private void OnWaitingRecipesListChanged(object sender, EventArgs e)
     {
-      UpdateVisual();
+     UpdateVisual();
     }
 
     private void Awake()
@@ -30,15 +30,18 @@ public class DeliveryManagerUi : MonoBehaviour
         {
             if (child != recipeTemplate)
             {
-                Destroy(child);
+                Destroy(child.gameObject);
             }
 
-            foreach (var waitingOrder in DeliveryManager.Instance.GetWaitingRecipesList())
-            {
-               Transform instantiatedTemplate= Instantiate(recipeTemplate, container);
+            
+        }
+        foreach (var waitingOrder in DeliveryManager.Instance.GetWaitingRecipesList())
+        {
+            Transform instantiatedTemplate= Instantiate(recipeTemplate, container);
                
-               instantiatedTemplate.gameObject.SetActive(true);
-            }
+            instantiatedTemplate.gameObject.SetActive(true);
+           var deliveryManagerSingleUi= instantiatedTemplate.GetComponent<DeliverManagerSingleUi>();
+           deliveryManagerSingleUi.SetUpUi(waitingOrder);
         }
     }
 }
