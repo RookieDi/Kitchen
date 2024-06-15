@@ -1,7 +1,10 @@
+using System;
 using UnityEngine;
 
 public class BaseCounter : MonoBehaviour,IKitchenObjectParent
 {
+
+ public static event EventHandler OnAnyObjHere;
  
  [SerializeField] private Transform counterTopPoint;
    
@@ -24,6 +27,11 @@ public class BaseCounter : MonoBehaviour,IKitchenObjectParent
  public void SetKitchenObject(KitchenObject kitchenObject)
  {
   this.kitchenObj = kitchenObject;
+
+  if (kitchenObject != null)
+  {
+   OnAnyObjHere?.Invoke(this,EventArgs.Empty);
+  }
  }
 
  public KitchenObject GetKitchenObject()

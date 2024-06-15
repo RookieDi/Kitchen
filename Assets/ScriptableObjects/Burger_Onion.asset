@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3c3e140046ea084e8ccfa3ca727296e, type: 3}
+  m_Name: Burger_Onion
+  m_EditorClassIdentifier: 
+  KitchenObjectSoList:
+  - {fileID: 11400000, guid: eb9d7e600cc5ff84baae56d26680cf93, type: 2}
+  - {fileID: 11400000, guid: 823b73e7bc4f8164c96cd4da77ff8214, type: 2}
+  - {fileID: 11400000, guid: a50dbd16ab1a5a74390f17a6b1e0724e, type: 2}
+  - {fileID: 11400000, guid: 565c2b39e4ec4484da08b3344e75b27d, type: 2}
+  - {fileID: 11400000, guid: 765e2b88356fff4488ed42cda029ef96, type: 2}
+  - {fileID: 11400000, guid: c3f2748d160b8214b9984ab91d75ec95, type: 2}
+  recipeName: OnionBurger

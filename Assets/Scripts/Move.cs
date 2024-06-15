@@ -6,7 +6,7 @@ public class Move : MonoBehaviour,IKitchenObjectParent
 {
     public static Move Instance { get; private set; }
 
-    
+    public event EventHandler onPickSmth;
     public event EventHandler <OnSelectedCounterChangedEventArgs>OnSelectedCounterchanged;
     
     public class OnSelectedCounterChangedEventArgs : EventArgs
@@ -187,6 +187,10 @@ public class Move : MonoBehaviour,IKitchenObjectParent
     public void SetKitchenObject(KitchenObject kitchenObject)
     {
         this.kitchenObj = kitchenObject;
+        if (kitchenObject != null)
+        {
+            onPickSmth?.Invoke(this,EventArgs.Empty);
+        }
     }
 
     public KitchenObject GetKitchenObject()

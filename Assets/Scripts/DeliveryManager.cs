@@ -1,13 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class DeliveryManager : MonoBehaviour
 {
 
-    public event EventHandler OnRecipeAdded,OnRecipeCompleted; 
+    public event EventHandler OnRecipeAdded,OnRecipeCompleted;
+    public event EventHandler OnRecipeSucces, OnRecipeFailed;
     
     
     public static DeliveryManager Instance { get; private set; }
@@ -16,8 +18,9 @@ public class DeliveryManager : MonoBehaviour
 
 
     private float spawnRecipeTimer;
-    private float spawnRecipeTimerMax = 4f;
-    private int waitingRecipesMax = 4;
+    private float spawnRecipeTimerMax = 8f;
+    private int waitingRecipesMax = 7;
+    private float spawnDelay = 2f; // Delay between recipe spawns
 
     private void Awake()
     {
@@ -30,6 +33,10 @@ public class DeliveryManager : MonoBehaviour
         if (spawnRecipeTimer <= 0f)
         {
             spawnRecipeTimer = spawnRecipeTimerMax;
+            if (waitingRecipeSOList.Count < waitingRecipesMax)
+            {
+                StartCoroutine(SpawnRecipesWithDelay());
+            }
         }
 
         if (waitingRecipeSOList.Count < waitingRecipesMax)
@@ -39,6 +46,18 @@ public class DeliveryManager : MonoBehaviour
            waitingRecipeSOList.Add(waitingRecipeSo);
            
            OnRecipeAdded?.Invoke(this,EventArgs.Empty);
+        }
+    }
+    private IEnumerator SpawnRecipesWithDelay()
+    {
+        while (waitingRecipeSOList.Count < waitingRecipesMax)
+        {
+            RecipeSo waitingRecipeSo = _recipeList.recipeSOList[Random.Range(0, _recipeList.recipeSOList.Count)];
+            Debug.Log(waitingRecipeSo.recipeName);
+            waitingRecipeSOList.Add(waitingRecipeSo);
+            OnRecipeAdded?.Invoke(this, EventArgs.Empty);
+
+            yield return new WaitForSeconds(spawnDelay); // Wait for the delay before spawning the next recipe
         }
     }
 
@@ -83,13 +102,14 @@ public class DeliveryManager : MonoBehaviour
                     waitingRecipeSOList.RemoveAt(i);
                     
                     OnRecipeCompleted?.Invoke(this,EventArgs.Empty);
+                    OnRecipeSucces?.Invoke(this,EventArgs.Empty);
                     return;
                 }
             }
         }
         //No matches
         //Incorect recipe
-        Debug.Log("Incorect recipe");
+       OnRecipeFailed?.Invoke(this,EventArgs.Empty);
     }
 
     public List<RecipeSo> GetWaitingRecipesList()
