@@ -3,7 +3,10 @@ using UnityEngine;
 
 public class BaseCounter : MonoBehaviour,IKitchenObjectParent
 {
-
+ public static void ResetStaticData()
+ {
+  OnAnyObjHere = null;
+ }
  public static event EventHandler OnAnyObjHere;
  
  [SerializeField] private Transform counterTopPoint;

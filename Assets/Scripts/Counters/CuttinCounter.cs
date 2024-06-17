@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class CuttinCounter : BaseCounter,IHasProgressBar
 {
+   new public static void ResetStaticData()
+    {
+        OnAnyCut = null;
+    }
+    
     public event EventHandler<IHasProgressBar.OnProgressChangedEventArgs> OnProgressChanged;
-    
-    
 
-    public event EventHandler OnCut;
-
+    public event EventHandler OnCut; 
     public static  event EventHandler OnAnyCut;
     
     
