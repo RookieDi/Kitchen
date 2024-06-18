@@ -92,7 +92,7 @@ public class GameInput : MonoBehaviour
            case Bindings.MoveRight:
                return _playerInputActions.Player.Move.bindings[4].ToDisplayString();
            case Bindings.Interact:
-               return _playerInputActions.Player.Move.bindings[0].ToDisplayString();
+               return _playerInputActions.Player.Interact.bindings[0].ToDisplayString();
            case Bindings.InteractAlternate:
               return _playerInputActions.Player.InteractAlternate.bindings[0].ToDisplayString();
            case Bindings.Pause:
@@ -101,6 +101,54 @@ public class GameInput : MonoBehaviour
                return "Key Not Found";
            
        }
+   }
+
+   public void RebinDBinding(Bindings binding,Action onActionRebound)
+   {
+       InputAction inputAction;
+       int bindingIndex;
+       switch (binding)
+       {
+           default: 
+           case Bindings.MoveUp:
+               inputAction = _playerInputActions.Player.Move;
+               bindingIndex = 1;
+           break;
+           case Bindings.MoveDown:
+               inputAction = _playerInputActions.Player.Move;
+               bindingIndex = 2;
+               break;
+           case Bindings.MoveRight:
+               inputAction = _playerInputActions.Player.Move;
+               bindingIndex = 4;
+               break;
+           case Bindings.MoveLeft:
+               inputAction = _playerInputActions.Player.Move;
+               bindingIndex = 3;
+               break;
+           case Bindings.Interact:
+               inputAction = _playerInputActions.Player.Interact;
+               bindingIndex = 5;
+               break;
+           case Bindings.InteractAlternate:
+               inputAction = _playerInputActions.Player.InteractAlternate;
+               bindingIndex = 6;
+               break;
+           case Bindings.Pause:
+               inputAction = _playerInputActions.Player.Pause;
+               bindingIndex = 7;
+               break;
+       }
+       _playerInputActions.Player.Disable();
+
+      inputAction.PerformInteractiveRebinding(bindingIndex)
+           .OnComplete(callback =>
+           {
+               callback.Dispose();
+               _playerInputActions.Player.Enable();
+               onActionRebound();
+           })
+           .Start();
    }
   
 }
