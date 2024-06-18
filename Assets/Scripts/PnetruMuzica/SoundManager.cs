@@ -11,6 +11,7 @@ public class SoundManager : MonoBehaviour
     public static SoundManager Instance { get; private set; }
     
     [SerializeField] private AudioRefsScriptateObject _audioRefsScriptateObject;
+    public float EffectsVolume = 1f;
 
     private void Awake()
     {
@@ -72,7 +73,7 @@ public class SoundManager : MonoBehaviour
     }
     public void PlaySound(AudioClip audioClip, Vector3 position, float volume = 1f)
     {
-        AudioSource.PlayClipAtPoint(audioClip,position,volume);
+        AudioSource.PlayClipAtPoint(audioClip,position,volume * EffectsVolume);
     }
 
     public void PlayFootstepsSound(Vector3 position, float volume)

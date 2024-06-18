@@ -6,6 +6,17 @@ using UnityEngine.InputSystem;
 public class GameInput : MonoBehaviour
 {
     
+    public enum Bindings
+    {
+        MoveUp,
+        MoveDown,
+        MoveLeft,
+        MoveRight,
+        Interact,
+        InteractAlternate,
+        Pause
+    }
+    
     public static GameInput Instance { get; private set; }
    private PlayerInputActions _playerInputActions;
    public event EventHandler OnInteractAction;
@@ -33,6 +44,8 @@ public class GameInput : MonoBehaviour
        
        _playerInputActions.Dispose();
    }
+   
+   
 
    private void Pause_performed(InputAction.CallbackContext obj)
    {
@@ -64,6 +77,30 @@ public class GameInput : MonoBehaviour
        
        return inputVector.normalized;
 
+   }
+
+   public string GetBindingText(Bindings bindings)
+   {
+       switch (bindings)
+       {
+           case Bindings.MoveUp:
+               return _playerInputActions.Player.Move.bindings[1].ToDisplayString();
+           case Bindings.MoveDown:
+               return _playerInputActions.Player.Move.bindings[2].ToDisplayString();
+           case Bindings.MoveLeft:
+               return _playerInputActions.Player.Move.bindings[3].ToDisplayString();
+           case Bindings.MoveRight:
+               return _playerInputActions.Player.Move.bindings[4].ToDisplayString();
+           case Bindings.Interact:
+               return _playerInputActions.Player.Move.bindings[0].ToDisplayString();
+           case Bindings.InteractAlternate:
+              return _playerInputActions.Player.InteractAlternate.bindings[0].ToDisplayString();
+           case Bindings.Pause:
+               return _playerInputActions.Player.Pause.bindings[0].ToDisplayString();
+           default:
+               return "Key Not Found";
+           
+       }
    }
   
 }

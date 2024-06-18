@@ -12,6 +12,8 @@ public class GamePausedUi : MonoBehaviour
 
     [SerializeField] private Button resumeButton;
     [SerializeField] private Button MainMenuButton;
+    [SerializeField] private VolumeController volumeControllerPanel;
+    [SerializeField] private Button optionsMenuButton;
    // public string mainMenuSceneName = "Assets/Scenes/StartScene"; 
     public string gameSceneName = "GameScene";
 #if UNITY_EDITOR
@@ -20,11 +22,18 @@ public class GamePausedUi : MonoBehaviour
     private void Awake()
     {
         resumeButton.onClick.AddListener(OnResumeButtonClicked);
-
+        optionsMenuButton.onClick.AddListener(OnOptionMenuButton);
         
         MainMenuButton.onClick.AddListener(OnMainMenuButtonClicked);
 
 }
+
+    private void OnOptionMenuButton()
+    {
+        volumeControllerPanel.Show();
+        
+    }
+
     private void OnResumeButtonClicked()
     {
         GameManager.Instance.PauseGameStart();
