@@ -50,6 +50,7 @@ public class GameInput : MonoBehaviour
    private void Pause_performed(InputAction.CallbackContext obj)
    {
        OnpauseAction?.Invoke(this,EventArgs.Empty);
+       
    }
 
    private void InteractAlternate_Performed(InputAction.CallbackContext obj)
@@ -62,8 +63,8 @@ public class GameInput : MonoBehaviour
 
    private void Interact_performed(InputAction.CallbackContext obj)
    {
+       
       
-       //Debug.Log("dd");
        if (OnInteractAction != null)
        {
             OnInteractAction?.Invoke(this, EventArgs.Empty);
