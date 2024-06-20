@@ -38,7 +38,7 @@ public class GameOverUi : MonoBehaviour
     private void Show()
     {
         gameObject.SetActive(true);
-        recipesDeliveredText.text = DeliveryManager.Instance.GetSuccesfullDeliveries().ToString();
+        recipesDeliveredText.text = DeliveryManager.Instance.GetSuccessfulDeliveries().ToString();
 
     }
 

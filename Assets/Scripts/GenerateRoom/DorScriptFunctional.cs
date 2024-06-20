@@ -5,28 +5,27 @@ using UnityEngine;
 
 public class DorScriptFunctional : MonoBehaviour
 {
-    private Animator _doorAnimator;
-
-    private void Start()
-    {
-        _doorAnimator = GetComponent<Animator>();
-
-    }
+    [SerializeField] private float openSpeed = 3f; 
+    private bool isOpening = false;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
-
+        if (other.CompareTag("Player") && !isOpening)
         {
-            _doorAnimator.SetTrigger("Open");
+            isOpening = true;
+            OpenDoor();
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    private void OpenDoor()
     {
-        if (other.CompareTag("Player"))
-        {
-            _doorAnimator.SetTrigger("Closed");
-        }
+        
+        Vector3 targetPosition = transform.position + Vector3.up * 2f;
+
+      
+        Rigidbody rb = GetComponent<Rigidbody>();
+        rb.isKinematic = false; 
+        rb.MovePosition(Vector3.Lerp(transform.position, targetPosition, openSpeed * Time.deltaTime));
     }
+
 }
