@@ -23,7 +23,7 @@ public class SoundManager : MonoBehaviour
         DeliveryManager.Instance.OnRecipeSucces += DeliveryManager_MusicSucces; 
         DeliveryManager.Instance.OnRecipeFailed += DeliveryManager_MusicFailed;
         CuttinCounter.OnAnyCut += OnAnyCuttinCunter_Music;
-        Move.Instance.onPickSmth += Player_OnPickedSmth;
+      //  Move.Instance.onPickSmth += Player_OnPickedSmth;
         BaseCounter.OnAnyObjHere += Object_PlacedMusic;
         TrashBin.OnAnyObjTrashed += Object_TraashBinMusic;
     }
@@ -43,7 +43,7 @@ public class SoundManager : MonoBehaviour
 
     private void Player_OnPickedSmth(object sender, EventArgs e)
     {
-        PlaySound(_audioRefsScriptateObject.objectPickup,Move.Instance.transform.position);
+        //PlaySound(_audioRefsScriptateObject.objectPickup,Move.Instance.transform.position);
     }
 
     private void OnAnyCuttinCunter_Music(object sender, EventArgs e)

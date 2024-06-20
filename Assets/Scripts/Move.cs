@@ -1,8 +1,9 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
 
-public class Move : MonoBehaviour,IKitchenObjectParent
+public class Move : NetworkBehaviour,IKitchenObjectParent
 {
     public static Move Instance { get; private set; }
 
@@ -28,20 +29,17 @@ public class Move : MonoBehaviour,IKitchenObjectParent
     private KitchenObject kitchenObj;
     private void Awake()
     {
-        if (Instance == null)
+        /*if (Instance == null)
         {
             Instance = this;
-        }
-        else
-        {
-            Debug.LogError("There is more than one player instance!!!");
-        }
+      }
+      */ 
     }
 
     private void Start()
     {
-        _gameInput.OnInteractAction += GameInput_OnInteraction;
-        _gameInput.OnInteractAlteranteAction += GameInput_OnAlternateInteraction;
+        GameInput.Instance.OnInteractAction += GameInput_OnInteraction;
+        GameInput.Instance.OnInteractAlteranteAction += GameInput_OnAlternateInteraction;
     }
 
     private void GameInput_OnAlternateInteraction(object sender, EventArgs e)
@@ -85,7 +83,7 @@ public class Move : MonoBehaviour,IKitchenObjectParent
 
     private void HandleInteraction()
     {
-        Vector2 inputVector = _gameInput.GetMovementVectorNormalized();
+        Vector2 inputVector = GameInput.Instance.GetMovementVectorNormalized();
         Vector3 moveDir = new Vector3(inputVector.x,0f, inputVector.y);
         float interactDistance = 1f;
         if (moveDir != Vector3.zero)
@@ -119,7 +117,7 @@ public class Move : MonoBehaviour,IKitchenObjectParent
 
     private void HandleMovement()
     {
-        Vector2 inputVector = _gameInput.GetMovementVectorNormalized();
+        Vector2 inputVector = GameInput.Instance.GetMovementVectorNormalized();
         Vector3 moveDir = new Vector3(inputVector.x,0, inputVector.y);
         float moveDistance = moveSpeed * Time.deltaTime;
         bool canMove= !Physics.CapsuleCast(transform.position,transform.position +Vector3.up*_playerHeight,_playerRadius, moveDir, moveDistance);
