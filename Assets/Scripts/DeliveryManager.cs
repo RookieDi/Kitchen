@@ -31,12 +31,10 @@ public class DeliveryManager : NetworkBehaviour
 
     private void Update()
     {
-        Debug.Log("First Frame");
         if (!IsServer)
         {
             return;
         }
-        Debug.Log("2 Frame");
         spawnRecipeTimer -= Time.deltaTime;
         if (spawnRecipeTimer <= 0f)
         {
