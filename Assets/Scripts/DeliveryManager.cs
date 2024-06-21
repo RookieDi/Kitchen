@@ -1,11 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class DeliveryManager : MonoBehaviour
+public class DeliveryManager : NetworkBehaviour
 {
 
     public event EventHandler OnRecipeAdded,OnRecipeCompleted;
@@ -30,6 +31,12 @@ public class DeliveryManager : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log("First Frame");
+        if (!IsServer)
+        {
+            return;
+        }
+        Debug.Log("2 Frame");
         spawnRecipeTimer -= Time.deltaTime;
         if (spawnRecipeTimer <= 0f)
         {
@@ -42,13 +49,21 @@ public class DeliveryManager : MonoBehaviour
 
         if (waitingRecipeSOList.Count < waitingRecipesMax)
         {
-            RecipeSo waitingRecipeSo = _recipeList.recipeSOList[Random.Range(0, _recipeList.recipeSOList.Count)];
-           Debug.Log(waitingRecipeSo.recipeName);
-           waitingRecipeSOList.Add(waitingRecipeSo);
-           
-           OnRecipeAdded?.Invoke(this,EventArgs.Empty);
+            int waitingRecipeSoIndex = Random.Range(0, _recipeList.recipeSOList.Count);
+            SpawnedNewWaitingRecipeClientRpc(waitingRecipeSoIndex);
+          
         }
     }
+
+    [ClientRpc]
+    private void SpawnedNewWaitingRecipeClientRpc(int waitingRecipeSoIndex)
+    {
+        RecipeSo waitingRecipeSo = _recipeList.recipeSOList[waitingRecipeSoIndex];
+        waitingRecipeSOList.Add(waitingRecipeSo);
+           
+        OnRecipeAdded?.Invoke(this,EventArgs.Empty);
+    }
+    
     private IEnumerator SpawnRecipesWithDelay()
     {
         while (waitingRecipeSOList.Count < waitingRecipesMax)
