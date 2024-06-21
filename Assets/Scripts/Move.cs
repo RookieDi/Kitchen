@@ -5,9 +5,10 @@ using UnityEngine;
 
 public class Move : NetworkBehaviour,IKitchenObjectParent
 {
-    public static Move Instance { get; private set; }
+    public static Move LocalInstance { get; private set; }
 
     public event EventHandler onPickSmth;
+    public static event EventHandler OnAnyPlayerSpawned;
     public event EventHandler <OnSelectedCounterChangedEventArgs>OnSelectedCounterchanged;
     
     public class OnSelectedCounterChangedEventArgs : EventArgs
@@ -27,13 +28,20 @@ public class Move : NetworkBehaviour,IKitchenObjectParent
     private Vector3 lastInteractDir;
 
     private KitchenObject kitchenObj;
-    private void Awake()
+
+    
+    new public static void ResetStaticData()
     {
-        /*if (Instance == null)
+        OnAnyPlayerSpawned = null;
+    }
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        if (IsOwner)
         {
-            Instance = this;
-      }
-      */ 
+            LocalInstance = this;
+        }
+        OnAnyPlayerSpawned?.Invoke(this,EventArgs.Empty);
     }
 
     private void Start()

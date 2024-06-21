@@ -110,20 +110,48 @@ public class DeliveryManager : NetworkBehaviour
 
                 if (plateContentsMatchesRecipe)
                 {
-                    //Player deliver the correct recipe
-                    Succesful++;
-                    Debug.Log("Player deliver the correct recipe");
-                    waitingRecipeSOList.RemoveAt(i);
-                    
-                    OnRecipeCompleted?.Invoke(this,EventArgs.Empty);
-                    OnRecipeSucces?.Invoke(this,EventArgs.Empty);
+                    DeliverySuccessfullRecipeServerRpc(i);
+                    Debug.Log("Trying ro deliver");
                     return;
                 }
             }
         }
         //No matches
         //Incorect recipe
-       OnRecipeFailed?.Invoke(this,EventArgs.Empty);
+       //OnRecipeFailed?.Invoke(this,EventArgs.Empty);
+       DeliveryUnsuccesfullyServerRpc();
+       Debug.Log("Trying ro fail");
+    }
+
+    [ClientRpc]
+        private void DeliverySuccessfullRecipeClientRpc(int waitingRecipeIndex)
+    {
+        //Player deliver the correct recipe
+        Succesful++;
+        Debug.Log("Player deliver the correct recipe");
+        waitingRecipeSOList.RemoveAt(waitingRecipeIndex);
+                    
+        OnRecipeCompleted?.Invoke(this,EventArgs.Empty);
+        OnRecipeSucces?.Invoke(this,EventArgs.Empty);
+        
+        
+    }
+    [ServerRpc]
+    private void DeliverySuccessfullRecipeServerRpc(int waitingRecipeIndex)
+    {
+        DeliverySuccessfullRecipeClientRpc(waitingRecipeIndex);
+    }
+
+    [ClientRpc]
+    private void DeliveryUnsuccesfullyRecipeClientRpc()
+    {
+        OnRecipeFailed?.Invoke(this,EventArgs.Empty);
+    }
+
+    [ServerRpc]
+    private void DeliveryUnsuccesfullyServerRpc()
+    {
+        DeliveryUnsuccesfullyRecipeClientRpc();
     }
 
     public List<RecipeSo> GetWaitingRecipesList()

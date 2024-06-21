@@ -10,5 +10,6 @@ public class DestoryStaticLoaders : MonoBehaviour
         CuttinCounter.ResetStaticData();
         BaseCounter.ResetStaticData();
         TrashBin.ResetStaticData();
+        Move.ResetStaticData();
     }
 }
