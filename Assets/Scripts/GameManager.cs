@@ -35,6 +35,10 @@ public class GameManager : MonoBehaviour
   private void Start()
   {
     GameInput.Instance.OnpauseAction += GameInput_OnPause;
+
+//DEBUG TRIGGER AUTOMATICALLY START
+    state = State.CountdownToStart;
+    OnStateChanged?.Invoke(this,EventArgs.Empty);
   }
 
   private void GameInput_OnPause(object sender, EventArgs e)

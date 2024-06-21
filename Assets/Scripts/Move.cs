@@ -70,6 +70,10 @@ public class Move : NetworkBehaviour,IKitchenObjectParent
 
     private void Update()
     {
+        if (!IsOwner)
+        {
+            return;
+        }
        
        HandleMovement();
       HandleInteraction();
@@ -115,9 +119,11 @@ public class Move : NetworkBehaviour,IKitchenObjectParent
 
     }
 
+    
     private void HandleMovement()
     {
         Vector2 inputVector = GameInput.Instance.GetMovementVectorNormalized();
+        
         Vector3 moveDir = new Vector3(inputVector.x,0, inputVector.y);
         float moveDistance = moveSpeed * Time.deltaTime;
         bool canMove= !Physics.CapsuleCast(transform.position,transform.position +Vector3.up*_playerHeight,_playerRadius, moveDir, moveDistance);
