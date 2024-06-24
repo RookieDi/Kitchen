@@ -1,54 +1,60 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class BaseCounter : MonoBehaviour,IKitchenObjectParent
-{
- public static void ResetStaticData()
- {
-  OnAnyObjHere = null;
- }
- public static event EventHandler OnAnyObjHere;
- 
- [SerializeField] private Transform counterTopPoint;
-   
+public class BaseCounter : NetworkBehaviour, IKitchenObjectParent {
 
- public KitchenObject kitchenObj;
 
- public virtual void Interact(Move player)
- {
-  Debug.LogError("BaseCounter.Interact();");
- }
- public virtual void InteractAlternate(Move player)
- {
-  Debug.LogError("BaseCounter.InteractAlternate();");
- }
- public Transform GetkitchenObjectFollowTransform()
- {
-  return counterTopPoint;
- }
+    public static event EventHandler OnAnyObjectPlacedHere;
 
- public void SetKitchenObject(KitchenObject kitchenObject)
- {
-  this.kitchenObj = kitchenObject;
+    public static void ResetStaticData() {
+        OnAnyObjectPlacedHere = null;
+    }
 
-  if (kitchenObject != null)
-  {
-   OnAnyObjHere?.Invoke(this,EventArgs.Empty);
-  }
- }
 
- public KitchenObject GetKitchenObject()
- {
-  return kitchenObj;
- }
+    [SerializeField] private Transform counterTopPoint;
 
- public void ClearKitchenObject()
- {
-  kitchenObj = null;
- }
 
- public bool HasKitchenObject()
- {
-  return kitchenObj != null;
- }
+    private KitchenObject kitchenObject;
+
+
+    public virtual void Interact(Player player) {
+        Debug.LogError("BaseCounter.Interact();");
+    }
+
+    public virtual void InteractAlternate(Player player) {
+        //Debug.LogError("BaseCounter.InteractAlternate();");
+    }
+
+
+    public Transform GetKitchenObjectFollowTransform() {
+        return counterTopPoint;
+    }
+
+    public void SetKitchenObject(KitchenObject kitchenObject) {
+        this.kitchenObject = kitchenObject;
+
+        if (kitchenObject != null) {
+            OnAnyObjectPlacedHere?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    public KitchenObject GetKitchenObject() {
+        return kitchenObject;
+    }
+
+    public void ClearKitchenObject() {
+        kitchenObject = null;
+    }
+
+    public bool HasKitchenObject() {
+        return kitchenObject != null;
+    }
+
+    public NetworkObject GetNetworkObject() {
+        return NetworkObject;
+    }
+
 }

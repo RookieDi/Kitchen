@@ -2,165 +2,132 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-public class DeliveryManager : NetworkBehaviour
-{
+public class DeliveryManager : NetworkBehaviour {
 
-    public event EventHandler OnRecipeAdded,OnRecipeCompleted;
-    public event EventHandler OnRecipeSucces, OnRecipeFailed;
-    
-    
+
+    public event EventHandler OnRecipeSpawned;
+    public event EventHandler OnRecipeCompleted;
+    public event EventHandler OnRecipeSuccess;
+    public event EventHandler OnRecipeFailed;
+
+
     public static DeliveryManager Instance { get; private set; }
-    [SerializeField] private RecipeList _recipeList;
-    private List<RecipeSo> waitingRecipeSOList=new List<RecipeSo>();
 
 
-    private float spawnRecipeTimer;
-    private float spawnRecipeTimerMax = 8f;
-    private int waitingRecipesMax = 7;
-    private float spawnDelay = 2f; // Delay between recipe spawns
-    private int Succesful;
+    [SerializeField] private RecipeListSO recipeListSO;
 
-    private void Awake()
-    {
+
+    private List<RecipeSO> waitingRecipeSOList;
+    private float spawnRecipeTimer = 4f;
+    private float spawnRecipeTimerMax = 4f;
+    private int waitingRecipesMax = 4;
+    private int successfulRecipesAmount;
+
+
+    private void Awake() {
         Instance = this;
+
+
+        waitingRecipeSOList = new List<RecipeSO>();
     }
 
-    private void Update()
-    {
-        if (!IsServer)
-        {
+    private void Update() {
+        if (!IsServer) {
             return;
         }
-        spawnRecipeTimer -= Time.deltaTime;
-        if (spawnRecipeTimer <= 0f)
-        {
-            spawnRecipeTimer = spawnRecipeTimerMax;
-            if (waitingRecipeSOList.Count < waitingRecipesMax)
-            {
-                StartCoroutine(SpawnRecipesWithDelay());
-            }
-        }
 
-        if (waitingRecipeSOList.Count < waitingRecipesMax)
-        {
-            int waitingRecipeSoIndex = Random.Range(0, _recipeList.recipeSOList.Count);
-            SpawnedNewWaitingRecipeClientRpc(waitingRecipeSoIndex);
-          
+        spawnRecipeTimer -= Time.deltaTime;
+        if (spawnRecipeTimer <= 0f) {
+            spawnRecipeTimer = spawnRecipeTimerMax;
+
+            if (KitchenGameManager.Instance.IsGamePlaying() && waitingRecipeSOList.Count < waitingRecipesMax) {
+                int waitingRecipeSOIndex = UnityEngine.Random.Range(0, recipeListSO.recipeSOList.Count);
+
+                SpawnNewWaitingRecipeClientRpc(waitingRecipeSOIndex);
+            }
         }
     }
 
     [ClientRpc]
-    private void SpawnedNewWaitingRecipeClientRpc(int waitingRecipeSoIndex)
-    {
-        RecipeSo waitingRecipeSo = _recipeList.recipeSOList[waitingRecipeSoIndex];
-        waitingRecipeSOList.Add(waitingRecipeSo);
-           
-        OnRecipeAdded?.Invoke(this,EventArgs.Empty);
-    }
-    
-    private IEnumerator SpawnRecipesWithDelay()
-    {
-        while (waitingRecipeSOList.Count < waitingRecipesMax)
-        {
-            RecipeSo waitingRecipeSo = _recipeList.recipeSOList[Random.Range(0, _recipeList.recipeSOList.Count)];
-            Debug.Log(waitingRecipeSo.recipeName);
-            waitingRecipeSOList.Add(waitingRecipeSo);
-            OnRecipeAdded?.Invoke(this, EventArgs.Empty);
+    private void SpawnNewWaitingRecipeClientRpc(int waitingRecipeSOIndex) {
+        RecipeSO waitingRecipeSO = recipeListSO.recipeSOList[waitingRecipeSOIndex];
 
-            yield return new WaitForSeconds(spawnDelay); // Wait for the delay before spawning the next recipe
-        }
+        waitingRecipeSOList.Add(waitingRecipeSO);
+
+        OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
     }
 
-    public void DeliverRecipe(PlateKitchenObject plateKitchenObject)
-    {
-        for (int i = 0; i < waitingRecipeSOList.Count; i++)
-        {
-            RecipeSo waitingRecipeSo = waitingRecipeSOList[i];
+    public void DeliverRecipe(PlateKitchenObject plateKitchenObject) {
+        for (int i = 0; i < waitingRecipeSOList.Count; i++) {
+            RecipeSO waitingRecipeSO = waitingRecipeSOList[i];
 
-            if (waitingRecipeSo.KitchenObjectSoList.Count == plateKitchenObject.GetIngredientSo().Count)
-            {
+            if (waitingRecipeSO.kitchenObjectSOList.Count == plateKitchenObject.GetKitchenObjectSOList().Count) {
+                // Has the same number of ingredients
                 bool plateContentsMatchesRecipe = true;
-                //Has the same number of ingridients
-                foreach (KitchenObjectSO recipeKitchenObjectSo in waitingRecipeSo.KitchenObjectSoList)
-                {
-                    bool ingridientFound = false;
-                    //Cycling through all ingridients in the recipe
-                    foreach (KitchenObjectSO plateKitchenObjectSo in plateKitchenObject.GetIngredientSo())
-                    {
-                        //Through all ingridients in the plate
-
-                        if (plateKitchenObjectSo == recipeKitchenObjectSo)
-                        {
-                            //ingridient match
-                            ingridientFound = true;
+                foreach (KitchenObjectSO recipeKitchenObjectSO in waitingRecipeSO.kitchenObjectSOList) {
+                    // Cycling through all ingredients in the Recipe
+                    bool ingredientFound = false;
+                    foreach (KitchenObjectSO plateKitchenObjectSO in plateKitchenObject.GetKitchenObjectSOList()) {
+                        // Cycling through all ingredients in the Plate
+                        if (plateKitchenObjectSO == recipeKitchenObjectSO) {
+                            // Ingredient matches!
+                            ingredientFound = true;
                             break;
                         }
                     }
-
-                    if (!ingridientFound)
-                    {
-                        //ingridient was not found on the plate
+                    if (!ingredientFound) {
+                        // This Recipe ingredient was not found on the Plate
                         plateContentsMatchesRecipe = false;
                     }
                 }
 
-                if (plateContentsMatchesRecipe)
-                {
-                    DeliverySuccessfullRecipeServerRpc(i);
-                    Debug.Log("Trying ro deliver");
+                if (plateContentsMatchesRecipe) {
+                    // Player delivered the correct recipe!
+                    DeliverCorrectRecipeServerRpc(i);
                     return;
                 }
             }
         }
-        //No matches
-        //Incorect recipe
-       //OnRecipeFailed?.Invoke(this,EventArgs.Empty);
-       DeliveryUnsuccesfullyServerRpc();
-       Debug.Log("Trying ro fail");
+
+        // No matches found!
+        // Player did not deliver a correct recipe
+        DeliverIncorrectRecipeServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void DeliverIncorrectRecipeServerRpc() {
+        DeliverIncorrectRecipeClientRpc();
     }
 
     [ClientRpc]
-        private void DeliverySuccessfullRecipeClientRpc(int waitingRecipeIndex)
-    {
-        //Player deliver the correct recipe
-        Succesful++;
-        Debug.Log("Player deliver the correct recipe");
-        waitingRecipeSOList.RemoveAt(waitingRecipeIndex);
-                    
-        OnRecipeCompleted?.Invoke(this,EventArgs.Empty);
-        OnRecipeSucces?.Invoke(this,EventArgs.Empty);
-        
-        
+    private void DeliverIncorrectRecipeClientRpc() {
+        OnRecipeFailed?.Invoke(this, EventArgs.Empty);
     }
-    [ServerRpc]
-    private void DeliverySuccessfullRecipeServerRpc(int waitingRecipeIndex)
-    {
-        DeliverySuccessfullRecipeClientRpc(waitingRecipeIndex);
+
+    [ServerRpc(RequireOwnership = false)]
+    private void DeliverCorrectRecipeServerRpc(int waitingRecipeSOListIndex) {
+        DeliverCorrectRecipeClientRpc(waitingRecipeSOListIndex);
     }
 
     [ClientRpc]
-    private void DeliveryUnsuccesfullyRecipeClientRpc()
-    {
-        OnRecipeFailed?.Invoke(this,EventArgs.Empty);
+    private void DeliverCorrectRecipeClientRpc(int waitingRecipeSOListIndex) {
+        successfulRecipesAmount++;
+
+        waitingRecipeSOList.RemoveAt(waitingRecipeSOListIndex);
+
+        OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
+        OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
     }
 
-    [ServerRpc]
-    private void DeliveryUnsuccesfullyServerRpc()
-    {
-        DeliveryUnsuccesfullyRecipeClientRpc();
-    }
 
-    public List<RecipeSo> GetWaitingRecipesList()
-    {
+    public List<RecipeSO> GetWaitingRecipeSOList() {
         return waitingRecipeSOList;
     }
 
-    public int GetSuccesfullDeliveries()
-    {
-        return Succesful;
+    public int GetSuccessfulRecipesAmount() {
+        return successfulRecipesAmount;
     }
+
 }

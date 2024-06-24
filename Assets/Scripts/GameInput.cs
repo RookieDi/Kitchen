@@ -2,154 +2,172 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public class GameInput : MonoBehaviour {
 
-public class GameInput : MonoBehaviour
-{
-    
-    public enum Bindings
-    {
-        MoveUp,
-        MoveDown,
-        MoveLeft,
-        MoveRight,
+
+    private const string PLAYER_PREFS_BINDINGS = "InputBindings";
+
+
+    public static GameInput Instance { get; private set; }
+
+
+
+    public event EventHandler OnInteractAction;
+    public event EventHandler OnInteractAlternateAction;
+    public event EventHandler OnPauseAction;
+    public event EventHandler OnBindingRebind;
+
+
+    public enum Binding {
+        Move_Up,
+        Move_Down,
+        Move_Left,
+        Move_Right,
         Interact,
         InteractAlternate,
-        Pause
+        Pause,
+        Gamepad_Interact,
+        Gamepad_InteractAlternate,
+        Gamepad_Pause
     }
-    
-    public static GameInput Instance { get; private set; }
-   private PlayerInputActions _playerInputActions;
-   public event EventHandler OnInteractAction;
-   public event EventHandler OnInteractAlteranteAction;
-   public event EventHandler OnpauseAction;
-   
-   
-   private void Awake()
-   {
-       Instance = this;
-     _playerInputActions = new PlayerInputActions();
-    _playerInputActions.Enable();
 
-    _playerInputActions.Player.Interact.performed += Interact_performed;
-    _playerInputActions.Player.InteractAlternate.performed += InteractAlternate_Performed;
-    _playerInputActions.Player.Pause.performed += Pause_performed;
-   }
 
-   private void OnDestroy()
-   {
-       _playerInputActions.Player.Interact.performed -= Interact_performed;
-       _playerInputActions.Player.InteractAlternate.performed -= InteractAlternate_Performed;
-       _playerInputActions.Player.Pause.performed -= Pause_performed; 
-       
-       
-       _playerInputActions.Dispose();
-   }
-   
-   
+    private PlayerInputActions playerInputActions;
 
-   private void Pause_performed(InputAction.CallbackContext obj)
-   {
-       OnpauseAction?.Invoke(this,EventArgs.Empty);
-       
-   }
 
-   private void InteractAlternate_Performed(InputAction.CallbackContext obj)
-   {
-       if (OnInteractAlteranteAction != null)
-       {
-           OnInteractAlteranteAction?.Invoke(this, EventArgs.Empty);
-       }
-   }
+    private void Awake() {
+        Instance = this;
 
-   private void Interact_performed(InputAction.CallbackContext obj)
-   {
-       
-      
-       if (OnInteractAction != null)
-       {
-            OnInteractAction?.Invoke(this, EventArgs.Empty);
-       }
-   }
 
-   public Vector2 GetMovementVectorNormalized()
-   {
-       Vector2 inputVector = _playerInputActions.Player.Move.ReadValue<Vector2>();
-      
-       
-       return inputVector.normalized;
+        playerInputActions = new PlayerInputActions();
 
-   }
+        if (PlayerPrefs.HasKey(PLAYER_PREFS_BINDINGS)) {
+            playerInputActions.LoadBindingOverridesFromJson(PlayerPrefs.GetString(PLAYER_PREFS_BINDINGS));
+        }
 
-   public string GetBindingText(Bindings bindings)
-   {
-       switch (bindings)
-       {
-           case Bindings.MoveUp:
-               return _playerInputActions.Player.Move.bindings[1].ToDisplayString();
-           case Bindings.MoveDown:
-               return _playerInputActions.Player.Move.bindings[2].ToDisplayString();
-           case Bindings.MoveLeft:
-               return _playerInputActions.Player.Move.bindings[3].ToDisplayString();
-           case Bindings.MoveRight:
-               return _playerInputActions.Player.Move.bindings[4].ToDisplayString();
-           case Bindings.Interact:
-               return _playerInputActions.Player.Interact.bindings[0].ToDisplayString();
-           case Bindings.InteractAlternate:
-              return _playerInputActions.Player.InteractAlternate.bindings[0].ToDisplayString();
-           case Bindings.Pause:
-               return _playerInputActions.Player.Pause.bindings[0].ToDisplayString();
-           default:
-               return "Key Not Found";
-           
-       }
-   }
+        playerInputActions.Player.Enable();
 
-   public void RebinDBinding(Bindings binding,Action onActionRebound)
-   {
-       InputAction inputAction;
-       int bindingIndex;
-       switch (binding)
-       {
-           default: 
-           case Bindings.MoveUp:
-               inputAction = _playerInputActions.Player.Move;
-               bindingIndex = 1;
-           break;
-           case Bindings.MoveDown:
-               inputAction = _playerInputActions.Player.Move;
-               bindingIndex = 2;
-               break;
-           case Bindings.MoveRight:
-               inputAction = _playerInputActions.Player.Move;
-               bindingIndex = 4;
-               break;
-           case Bindings.MoveLeft:
-               inputAction = _playerInputActions.Player.Move;
-               bindingIndex = 3;
-               break;
-           case Bindings.Interact:
-               inputAction = _playerInputActions.Player.Interact;
-               bindingIndex = 5;
-               break;
-           case Bindings.InteractAlternate:
-               inputAction = _playerInputActions.Player.InteractAlternate;
-               bindingIndex = 6;
-               break;
-           case Bindings.Pause:
-               inputAction = _playerInputActions.Player.Pause;
-               bindingIndex = 7;
-               break;
-       }
-       _playerInputActions.Player.Disable();
+        playerInputActions.Player.Interact.performed += Interact_performed;
+        playerInputActions.Player.InteractAlternate.performed += InteractAlternate_performed;
+        playerInputActions.Player.Pause.performed += Pause_performed;
+    }
 
-      inputAction.PerformInteractiveRebinding(bindingIndex)
-           .OnComplete(callback =>
-           {
-               callback.Dispose();
-               _playerInputActions.Player.Enable();
-               onActionRebound();
-           })
-           .Start();
-   }
-  
+    private void OnDestroy() {
+        playerInputActions.Player.Interact.performed -= Interact_performed;
+        playerInputActions.Player.InteractAlternate.performed -= InteractAlternate_performed;
+        playerInputActions.Player.Pause.performed -= Pause_performed;
+
+        playerInputActions.Dispose();
+    }
+
+    private void Pause_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
+        OnPauseAction?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void InteractAlternate_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
+        OnInteractAlternateAction?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void Interact_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj) {
+        OnInteractAction?.Invoke(this, EventArgs.Empty);
+    }
+
+    public Vector2 GetMovementVectorNormalized() {
+        Vector2 inputVector = playerInputActions.Player.Move.ReadValue<Vector2>();
+
+        inputVector = inputVector.normalized;
+
+        return inputVector;
+    }
+
+    public string GetBindingText(Binding binding) {
+        switch (binding) {
+            default:
+            case Binding.Move_Up:
+                return playerInputActions.Player.Move.bindings[1].ToDisplayString();
+            case Binding.Move_Down:
+                return playerInputActions.Player.Move.bindings[2].ToDisplayString();
+            case Binding.Move_Left:
+                return playerInputActions.Player.Move.bindings[3].ToDisplayString();
+            case Binding.Move_Right:
+                return playerInputActions.Player.Move.bindings[4].ToDisplayString();
+            case Binding.Interact:
+                return playerInputActions.Player.Interact.bindings[0].ToDisplayString();
+            case Binding.InteractAlternate:
+                return playerInputActions.Player.InteractAlternate.bindings[0].ToDisplayString();
+            case Binding.Pause:
+                return playerInputActions.Player.Pause.bindings[0].ToDisplayString();
+            case Binding.Gamepad_Interact:
+                return playerInputActions.Player.Interact.bindings[1].ToDisplayString();
+            case Binding.Gamepad_InteractAlternate:
+                return playerInputActions.Player.InteractAlternate.bindings[1].ToDisplayString();
+            case Binding.Gamepad_Pause:
+                return playerInputActions.Player.Pause.bindings[1].ToDisplayString();
+        }
+    }
+
+    public void RebindBinding(Binding binding, Action onActionRebound) {
+        playerInputActions.Player.Disable();
+
+        InputAction inputAction;
+        int bindingIndex;
+
+        switch (binding) {
+            default:
+            case Binding.Move_Up:
+                inputAction = playerInputActions.Player.Move;
+                bindingIndex = 1;
+                break;
+            case Binding.Move_Down:
+                inputAction = playerInputActions.Player.Move;
+                bindingIndex = 2;
+                break;
+            case Binding.Move_Left:
+                inputAction = playerInputActions.Player.Move;
+                bindingIndex = 3;
+                break;
+            case Binding.Move_Right:
+                inputAction = playerInputActions.Player.Move;
+                bindingIndex = 4;
+                break;
+            case Binding.Interact:
+                inputAction = playerInputActions.Player.Interact;
+                bindingIndex = 0;
+                break;
+            case Binding.InteractAlternate:
+                inputAction = playerInputActions.Player.InteractAlternate;
+                bindingIndex = 0;
+                break;
+            case Binding.Pause:
+                inputAction = playerInputActions.Player.Pause;
+                bindingIndex = 0;
+                break;
+            case Binding.Gamepad_Interact:
+                inputAction = playerInputActions.Player.Interact;
+                bindingIndex = 1;
+                break;
+            case Binding.Gamepad_InteractAlternate:
+                inputAction = playerInputActions.Player.InteractAlternate;
+                bindingIndex = 1;
+                break;
+            case Binding.Gamepad_Pause:
+                inputAction = playerInputActions.Player.Pause;
+                bindingIndex = 1;
+                break;
+        }
+
+        inputAction.PerformInteractiveRebinding(bindingIndex)
+            .OnComplete(callback => {
+                callback.Dispose();
+                playerInputActions.Player.Enable();
+                onActionRebound();
+
+                PlayerPrefs.SetString(PLAYER_PREFS_BINDINGS, playerInputActions.SaveBindingOverridesAsJson());
+                PlayerPrefs.Save();
+
+                OnBindingRebind?.Invoke(this, EventArgs.Empty);
+            })
+            .Start();
+    }
+
 }

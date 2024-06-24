@@ -1,27 +1,29 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
+public class CuttingCounterVisual : MonoBehaviour {
 
-public class CuttingCounterVisual : MonoBehaviour
-{
-   private Animator _animator;
 
-   [SerializeField] private CuttinCounter cuttinCounter;
+    private const string CUT = "Cut";
 
-   private const string CUT = "Cut";
 
-   private void Awake()
-   {
-      _animator = GetComponent<Animator>();
-   }
+    [SerializeField] private CuttingCounter cuttingCounter;
 
-   private void Start()
-   {
-      cuttinCounter.OnCut += CuttinCounter_OnCut;
-     
-   }
 
-   private void CuttinCounter_OnCut(object sender,System.EventArgs e)
-   {
-     _animator.SetTrigger(CUT);
-   }
+    private Animator animator;
+
+
+    private void Awake() {
+        animator = GetComponent<Animator>();
+    }
+
+    private void Start() {
+        cuttingCounter.OnCut += CuttingCounter_OnCut;
+    }
+
+    private void CuttingCounter_OnCut(object sender, System.EventArgs e) {
+        animator.SetTrigger(CUT);
+    }
+
 }
